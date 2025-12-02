@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+require('./cron/disconnect'); // add near top of server.js
+
 const helmet = require('helmet');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
@@ -10,6 +12,9 @@ const csurf = require('csurf');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
+const paymentRoutes = require('./routes/payment');
+
+
 
 
 const app = express();
@@ -35,6 +40,7 @@ app.disable('x-powered-by');
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/payment', paymentRoutes);
 
 // Basic route
 app.get('/', (req, res) => res.send('WiFi Billing System API Running 🚀'));

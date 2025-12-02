@@ -189,3 +189,30 @@ exports.getAuditLogs = async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 };
+
+/* =========================================================
+   11. ADMIN CHANGE PASSWORD
+========================================================= */
+exports.changePassword = async (req, res) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+        const userId = req.user.id;
+
+        const [rows] = await db.query("SELECT password FROM users WHERE id=?", [userId]);
+        const user = rows[0];
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        // Verify old password
+        const match = await bcrypt.compare(oldPassword, user.password);
+        if (!match) return res.status(400).json({ error: "Old password incorrect" });
+
+        // Hash new password
+        const hashed = await bcrypt.hash(newPassword, 10);
+        await db.query("UPDATE users SET password=? WHERE id=?", [hashed, userId]);
+
+        res.json({ message: "Password updated successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+};

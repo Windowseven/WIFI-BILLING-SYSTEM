@@ -158,4 +158,44 @@ router.get(
   adminController.getAuditLogs
 );
 
+/*=========================================================
+   PROTECTED ENDPOINTS; ADMIN CHANGES OWN PASSWORD
+========================================================= */
+router.post(
+    '/change-password',
+    auth.requireAuth,
+    auth.requireRole('admin'),
+    body('oldPassword').isLength({ min: 8 }),
+    body('newPassword').isLength({ min: 8 }),
+    adminController.changePassword
+);
+
+
+// -----------------------------
+// Online Payment Simulation
+// -----------------------------
+router.post(
+    '/simulate',
+    auth.requireAuth,
+    auth.requireRole('admin'),
+    body('voucher_id').isInt(),
+    body('user_id').isInt(),
+    body('amount').isFloat({ min: 0 }),
+    paymentController.simulatePayment
+);
+
+// -----------------------------
+// Physical Payment (Cash Payment)
+// -----------------------------
+router.post(
+    '/payments/physical',
+    auth.requireAuth,
+    auth.requireRole('admin'),
+    body('plan_id').isInt({ min: 1 }),
+    body('amount_paid').isFloat({ min: 0 }),
+    body('paid_by').optional().isString(),
+    paymentController.createPhysicalPayment
+);
+
+
 module.exports = router;
