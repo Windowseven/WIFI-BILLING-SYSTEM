@@ -13,6 +13,8 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 const paymentRoutes = require('./routes/payment');
+const hotspotRoutes = require('./routes/hotspot');
+
 
 
 
@@ -41,6 +43,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/hotspot', hotspotRoutes);
 
 // Basic route
 app.get('/', (req, res) => res.send('WiFi Billing System API Running 🚀'));
