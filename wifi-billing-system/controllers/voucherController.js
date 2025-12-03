@@ -77,9 +77,47 @@ exports.getByCode = async (req, res) => {
 };
 
 /* =========================================================
+   REDEEM VOUCHER
+========================================================= */
+exports.redeem = async (req, res) => {
+    try {
+        const { code, mac_address } = req.body;
+        
+        // Find and validate voucher
+        const [vouchers] = await db.query(
+            'SELECT * FROM vouchers WHERE code = ? AND status = "active" AND (expiry_date IS NULL OR expiry_date > NOW())',
+            [code]
+        );
+        
+        if (vouchers.length === 0) {
+            return res.status(404).json({ error: 'Invalid or expired voucher code' });
+        }
+        
+        const voucher = vouchers[0];
+        
+        // Mark voucher as used
+        await db.query(
+            'UPDATE vouchers SET status = "used", used_at = NOW(), mac_address = ? WHERE id = ?',
+            [mac_address, voucher.id]
+        );
+        
+        res.json({ 
+            message: 'Voucher redeemed successfully',
+            voucher: {
+                duration_minutes: voucher.duration_minutes,
+                data_limit_mb: voucher.data_limit_mb
+            }
+        });
+    } catch (error) {
+        console.error('Redeem voucher error:', error);
+        res.status(500).json({ error: 'Failed to redeem voucher' });
+    }
+};
+
+/* =========================================================
    DELETE VOUCHER
 ========================================================= */
-exports.deleteVoucher = async (req, res) => {
+exports.delete = async (req, res) => {
     try {
         const { id } = req.params;
 

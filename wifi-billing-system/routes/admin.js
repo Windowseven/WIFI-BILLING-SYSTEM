@@ -116,7 +116,7 @@ router.get(
 router.delete(
   '/vouchers/:id',
   param('id').isInt(),
-  voucherController.deleteVoucher
+  voucherController.delete
 );
 
 /* =========================================================
