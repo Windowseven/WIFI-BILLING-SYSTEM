@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
  require('./cron/disconnect'); // add near top of server.js
 const sessionCleaner = require("./cron/sessionCleaner");
+const hotspotRoutes = require('./routes/hotspot');
+
 
 
 const helmet = require('helmet');
