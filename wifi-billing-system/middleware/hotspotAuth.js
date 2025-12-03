@@ -5,3 +5,12 @@ module.exports = (req, res, next) => {
   }
   next();
 };
+
+if (!process.env.HOTSPOT_SHARED_SECRET) {
+    console.warn('HOTSPOT_SHARED_SECRET is not set; hotspot endpoints are unprotected!');
+    return res.status(500).json({ error: 'Server misconfiguration' });
+  }
+  if (!secret || secret !== process.env.HOTSPOT_SHARED_SECRET) {
+    return res.status(403).json({ error: 'Forbidden: invalid hotspot secret' });
+  }
+  return next();

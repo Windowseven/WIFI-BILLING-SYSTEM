@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body, query } = require('express-validator');
 const hotspotAuth = require('../controllers/hotspotAuth');
+const hotspotAuth = require('../middleware/hotspotAuth');
 
 // User enters voucher to login
 router.post(

@@ -1,7 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-require('./cron/disconnect'); // add near top of server.js
+ require('./cron/disconnect'); // add near top of server.js
+const sessionCleaner = require("./cron/sessionCleaner");
+
 
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -53,6 +55,10 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Something went wrong!' });
 });
+
+setInterval(() => {
+    sessionCleaner.runCleaner();
+}, 60 * 1000);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
