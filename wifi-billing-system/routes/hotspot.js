@@ -3,7 +3,7 @@ const router = express.Router();
 const { body, query } = require('express-validator');
 const hotspotController = require('../controllers/hotspotController');
 const hotspotAuth = require('../controllers/hotspotAuth');
-const hotspotAuth = require('../middleware/hotspotAuth');
+//const hotspotAuth = require('../middleware/hotspotAuth');
 
 // Authorize (user submits voucher) — can be public if portal handles secret
 router.post(

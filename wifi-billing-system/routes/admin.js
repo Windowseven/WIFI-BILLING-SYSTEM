@@ -3,10 +3,13 @@ const express = require('express');
 const router = express.Router();
 const { body, param, query } = require('express-validator');
 
+
 const auth = require('../middleware/authMiddleware');
 const adminController = require('../controllers/adminController');
 const voucherController = require('../controllers/voucherController');
 const planController = require('../controllers/planController');
+const paymentController = require('../controllers/paymentController');
+
 
 // Require Admin Authentication for ALL routes
 router.use(auth.requireAuth);
