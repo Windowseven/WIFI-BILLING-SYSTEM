@@ -1,0 +1,393 @@
+/* Enhanced Professional Styles */
+
+/* Advanced Animations */
+@keyframes slideInFromLeft {
+  0% { transform: translateX(-100%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInFromRight {
+  0% { transform: translateX(100%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  0% { transform: translateY(30px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Enhanced Card Animations */
+.card-enhanced {
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.card-enhanced:hover::before {
+  left: 100%;
+}
+
+.card-enhanced:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+}
+
+/* Loading Skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-text {
+  height: 16px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* Enhanced Buttons */
+.btn-enhanced {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-enhanced::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-enhanced:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-enhanced:active {
+  transform: scale(0.95);
+}
+
+/* Floating Action Button */
+.fab {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+}
+
+/* Enhanced Form Controls */
+.form-control-enhanced {
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 12px 16px;
+  transition: all 0.3s ease;
+  background: #fff;
+}
+
+.form-control-enhanced:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  transform: translateY(-2px);
+}
+
+.form-floating-enhanced {
+  position: relative;
+}
+
+.form-floating-enhanced label {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  background: white;
+  padding: 0 8px;
+  color: #6c757d;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.form-floating-enhanced input:focus + label,
+.form-floating-enhanced input:not(:placeholder-shown) + label {
+  top: 0;
+  font-size: 12px;
+  color: #667eea;
+}
+
+/* Enhanced Tables */
+.table-enhanced {
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.table-enhanced thead th {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: none;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 20px 15px;
+}
+
+.table-enhanced tbody tr {
+  transition: all 0.3s ease;
+}
+
+.table-enhanced tbody tr:hover {
+  background: rgba(102, 126, 234, 0.05);
+  transform: scale(1.01);
+}
+
+/* Enhanced Modals */
+.modal-enhanced .modal-content {
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  animation: bounceIn 0.5s ease;
+}
+
+.modal-enhanced .modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 20px 20px 0 0;
+  border: none;
+}
+
+/* Enhanced Sidebar */
+.sidebar-enhanced {
+  background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.sidebar-enhanced .nav-link {
+  position: relative;
+  margin: 5px 15px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.sidebar-enhanced .nav-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #3498db;
+  border-radius: 0 4px 4px 0;
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.sidebar-enhanced .nav-link:hover::before,
+.sidebar-enhanced .nav-link.active::before {
+  transform: scaleY(1);
+}
+
+.sidebar-enhanced .nav-link:hover {
+  background: rgba(52, 152, 219, 0.1);
+  transform: translateX(5px);
+}
+
+/* Enhanced Progress Bars */
+.progress-enhanced {
+  height: 8px;
+  border-radius: 10px;
+  background: #e9ecef;
+  overflow: hidden;
+}
+
+.progress-enhanced .progress-bar {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-enhanced .progress-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+/* Enhanced Badges */
+.badge-enhanced {
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
+}
+
+.badge-enhanced:hover::before {
+  left: 100%;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --bs-body-bg: #1a1a1a;
+  --bs-body-color: #e9ecef;
+  --bs-border-color: #404040;
+}
+
+[data-theme="dark"] .card {
+  background: #2d2d2d;
+  border-color: #404040;
+  color: #e9ecef;
+}
+
+[data-theme="dark"] .navbar-custom {
+  background: linear-gradient(90deg, #2d2d2d 0%, #404040 100%);
+}
+
+[data-theme="dark"] .sidebar {
+  background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
+[data-theme="dark"] .table-enhanced thead th {
+  background: linear-gradient(135deg, #2d2d2d 0%, #404040 100%);
+  color: #e9ecef;
+}
+
+[data-theme="dark"] .form-control-enhanced {
+  background: #2d2d2d;
+  border-color: #404040;
+  color: #e9ecef;
+}
+
+[data-theme="dark"] .form-control-enhanced:focus {
+  background: #2d2d2d;
+  border-color: #667eea;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+  .card-enhanced:hover {
+    transform: translateY(-5px) scale(1.01);
+  }
+  
+  .fab {
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+  
+  .sidebar-enhanced .nav-link:hover {
+    transform: none;
+  }
+}
+
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus Indicators */
+.focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .sidebar, .navbar, .fab, .toast-container {
+    display: none !important;
+  }
+  
+  .main-content {
+    margin-left: 0 !important;
+  }
+  
+  .card {
+    break-inside: avoid;
+  }
+}

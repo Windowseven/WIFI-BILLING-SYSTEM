@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - WiFi Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@4.0.0/dist/chart.min.css" rel="stylesheet">
+    <link href="/css/universal.css" rel="stylesheet">
+    <style>
+        /* Dashboard specific styles */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            background: var(--gradient);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--gray-900);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            color: var(--gray-600);
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        .change-positive {
+            color: var(--success);
+        }
+        
+        .change-negative {
+            color: var(--danger);
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .chart-card {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .chart-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+        
+        .chart-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+        
+        .chart-subtitle {
+            color: var(--gray-500);
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .chart-body {
+            padding: 16px 24px 24px;
+        }
+        
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+        
+        .activity-card {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+        }
+        
+        .activity-header {
+            padding: 24px 24px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .activity-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+        
+        .activity-subtitle {
+            color: var(--gray-500);
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .table-modern {
+            margin: 0;
+        }
+        
+        .table-modern thead th {
+            background: var(--gray-50);
+            border: none;
+            font-weight: 600;
+            color: var(--gray-700);
+            padding: 16px 24px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .table-modern tbody tr {
+            border-bottom: 1px solid var(--gray-100);
+            transition: all 0.2s ease;
+        }
+        
+        .table-modern tbody tr:hover {
+            background: var(--gray-50);
+        }
+        
+        .table-modern tbody td {
+            padding: 16px 24px;
+            border: none;
+            vertical-align: middle;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 12px;
+            font-size: 14px;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 2px;
+            font-size: 14px;
+        }
+        
+        .user-detail {
+            color: var(--gray-500);
+            font-size: 12px;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .status-expired {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .btn-outline-modern {
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+            background: transparent;
+            padding: 8px 16px;
+            border-radius: var(--radius-lg);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-outline-modern:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+            color: var(--gray-800);
+        }
+        
+        .btn-primary-modern {
+            background: var(--primary);
+            border: 1px solid var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: var(--radius-lg);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary-modern:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .activity-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-container">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="brand-section">
+                        <div class="brand-logo">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                        <div class="brand-text">
+                            <h1 class="brand-title">WiFi Manager</h1>
+                            <span class="brand-subtitle">Professional Edition</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="header-center">
+                    <nav class="breadcrumb-nav">
+                        <i class="fas fa-home"></i>
+                        <span class="breadcrumb-item">Admin</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span class="breadcrumb-current">Dashboard</span>
+                    </nav>
+                </div>
+                
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="action-btn" title="Notifications" onclick="showNotifications()">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                        <button class="action-btn" title="Refresh Data" onclick="refreshData()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="user-profile" onclick="toggleProfileMenu()">
+                        <div class="user-avatar" style="background: var(--primary);">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-info">
+                            <span class="user-name">Admin User</span>
+                            <span class="user-role">Administrator</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="main-sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <nav class="sidebar-nav">
+                    <div class="nav-section">
+                        <h3 class="nav-title">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Overview
+                        </h3>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="/admin/dashboard.html" class="nav-link active">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/analytics.html" class="nav-link">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Analytics</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <h3 class="nav-title">
+                            <i class="fas fa-users"></i>
+                            Management
+                        </h3>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="/admin/vouchers.html" class="nav-link">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    <span>Vouchers</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/sessions.html" class="nav-link">
+                                    <i class="fas fa-wifi"></i>
+                                    <span>Active Sessions</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/customers.html" class="nav-link">
+                                    <i class="fas fa-user-friends"></i>
+                                    <span>Customers</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <h3 class="nav-title">
+                            <i class="fas fa-cog"></i>
+                            System
+                        </h3>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="/admin/settings.html" class="nav-link">
+                                    <i class="fas fa-sliders-h"></i>
+                                    <span>Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Dashboard Overview
+                </h1>
+                <div class="page-actions">
+                    <button class="btn btn-outline-primary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card" style="--gradient: linear-gradient(135deg, var(--primary), var(--primary-light));">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="totalUsers">247</div>
+                            <div class="stat-label">Total Users Today</div>
+                            <div class="stat-change change-positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+12.5% vs yesterday</span>
+                            </div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card" style="--gradient: linear-gradient(135deg, var(--success), #059669);">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="activeSessions">89</div>
+                            <div class="stat-label">Active Sessions</div>
+                            <div class="stat-change change-positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+8.3% vs yesterday</span>
+                            </div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card" style="--gradient: linear-gradient(135deg, var(--warning), #d97706);">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="vouchersSold">156</div>
+                            <div class="stat-label">Vouchers Sold</div>
+                            <div class="stat-change change-positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+15.7% vs yesterday</span>
+                            </div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card" style="--gradient: linear-gradient(135deg, #8b5cf6, #a855f7);">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="totalRevenue">TSh 2,850,000</div>
+                            <div class="stat-label">Revenue Today</div>
+                            <div class="stat-change change-positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+22.1% vs yesterday</span>
+                            </div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Revenue Trend</h3>
+                        <p class="chart-subtitle">Daily revenue for the past week</p>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="revenueChart" height="100"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Voucher Types</h3>
+                        <p class="chart-subtitle">Distribution by duration</p>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="voucherChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Section -->
+            <div class="activity-grid">
+                <div class="activity-card">
+                    <div class="activity-header">
+                        <div>
+                            <h3 class="activity-title">Recent Sessions</h3>
+                            <p class="activity-subtitle">Latest user connections</p>
+                        </div>
+                        <a href="sessions.html" class="btn btn-outline-modern">View All</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-modern">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Time Left</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar" style="background: linear-gradient(135deg, var(--primary), var(--primary-light));">
+                                                <i class="fas fa-mobile-alt"></i>
+                                            </div>
+                                            <div class="user-info">
+                                                <div class="user-name">192.168.1.101</div>
+                                                <div class="user-detail">Mobile Device</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">45m</div>
+                                        <div class="text-muted small">of 60m</div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-active">
+                                            <i class="fas fa-circle me-1"></i>
+                                            Active
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar" style="background: linear-gradient(135deg, var(--success), #059669);">
+                                                <i class="fas fa-laptop"></i>
+                                            </div>
+                                            <div class="user-info">
+                                                <div class="user-name">192.168.1.102</div>
+                                                <div class="user-detail">Laptop</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">2h 15m</div>
+                                        <div class="text-muted small">of 24h</div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-active">
+                                            <i class="fas fa-circle me-1"></i>
+                                            Active
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar" style="background: linear-gradient(135deg, var(--warning), #d97706);">
+                                                <i class="fas fa-tablet-alt"></i>
+                                            </div>
+                                            <div class="user-info">
+                                                <div class="user-name">192.168.1.103</div>
+                                                <div class="user-detail">Tablet</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-danger">Expired</div>
+                                        <div class="text-muted small">1h ago</div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-expired">
+                                            <i class="fas fa-times-circle me-1"></i>
+                                            Expired
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <div class="activity-header">
+                        <div>
+                            <h3 class="activity-title">Recent Vouchers</h3>
+                            <p class="activity-subtitle">Latest voucher sales</p>
+                        </div>
+                        <a href="vouchers.html" class="btn btn-outline-modern">View All</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-modern">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Duration</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">WIFI-2024-001</div>
+                                        <div class="text-muted small">Created 2h ago</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">1 Hour</div>
+                                        <div class="text-muted small">$5.00</div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-active">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            Used
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">WIFI-2024-002</div>
+                                        <div class="text-muted small">Created 3h ago</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">24 Hours</div>
+                                        <div class="text-muted small">$15.00</div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-active">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            Used
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">WIFI-2024-003</div>
+                                        <div class="text-muted small">Created 4h ago</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">2 Hours</div>
+                                        <div class="text-muted small">$8.00</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-warning">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Active
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/universal.js"></script>
+    <script>
+        // Dashboard specific functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadDashboardData();
+            
+            // Auto-refresh data every 30 seconds
+            setInterval(loadDashboardData, 30000);
+        });
+
+        // Initialize charts
+        function initializeCharts() {
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart');
+            if (revenueCtx) {
+                new Chart(revenueCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Revenue',
+                            data: [1200, 1900, 3000, 5000, 2000, 3000, 4500],
+                            borderColor: 'rgb(37, 99, 235)',
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Voucher Chart
+            const voucherCtx = document.getElementById('voucherChart');
+            if (voucherCtx) {
+                new Chart(voucherCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['1 Hour', '2 Hours', '24 Hours', 'Weekly'],
+                        datasets: [{
+                            data: [30, 25, 35, 10],
+                            backgroundColor: [
+                                'rgb(37, 99, 235)',
+                                'rgb(16, 185, 129)',
+                                'rgb(245, 158, 11)',
+                                'rgb(139, 92, 246)'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/admin/dashboard-stats');
+                if (response.ok) {
+                    const data = await response.json();
+                    updateDashboardStats(data);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Update dashboard statistics
+        function updateDashboardStats(data) {
+            if (data.totalUsers !== undefined) {
+                document.getElementById('totalUsers').textContent = data.totalUsers;
+            }
+            if (data.activeSessions !== undefined) {
+                document.getElementById('activeSessions').textContent = data.activeSessions;
+            }
+            if (data.vouchersSold !== undefined) {
+                document.getElementById('vouchersSold').textContent = data.vouchersSold;
+            }
+            if (data.totalRevenue !== undefined) {
+                document.getElementById('totalRevenue').textContent = 'TSh ' + data.totalRevenue.toLocaleString();
+            }
+        }
+
+        // Refresh data
+        function refreshData() {
+            const refreshBtn = document.querySelector('[onclick="refreshData()"]');
+            setLoadingState(refreshBtn, true);
+            
+            loadDashboardData().finally(() => {
+                setLoadingState(refreshBtn, false);
+                showNotification('Dashboard data refreshed successfully', 'success');
+            });
+        }
+
+        // Show notifications
+        function showNotifications() {
+            showNotification('You have 3 new notifications', 'info');
+        }
+
+        // Profile menu toggle
+        function toggleProfileMenu() {
+            // This would typically show a dropdown menu
+            showNotification('Profile menu clicked', 'info');
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('adminToken');
+                window.location.href = '/admin/login.html';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Sessions - WiFi Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="/css/universal.css" rel="stylesheet">
+    <style>
+        .session-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        .session-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-left-color: var(--primary);
+        }
+        .progress-animated {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            animation: progress-shine 2s infinite;
+        }
+        @keyframes progress-shine {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .action-btn {
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-container">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="brand-section">
+                        <div class="brand-logo">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                        <div class="brand-text">
+                            <h1 class="brand-title">WiFi Manager</h1>
+                            <span class="brand-subtitle">Professional Edition</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="header-center">
+                    <nav class="breadcrumb-nav">
+                        <i class="fas fa-home"></i>
+                        <span class="breadcrumb-item">Admin</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span class="breadcrumb-current">Active Sessions</span>
+                    </nav>
+                </div>
+                
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="action-btn" title="Notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                        <button class="action-btn" title="Refresh" onclick="refreshSessions()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-avatar" style="background: var(--primary);">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-info">
+                            <span class="user-name">Admin User</span>
+                            <span class="user-role">Administrator</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="main-sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <nav class="sidebar-nav">
+                    <div class="nav-section">
+                        <h3 class="nav-title">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Overview
+                        </h3>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="/admin/dashboard.html" class="nav-link">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/analytics.html" class="nav-link">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Analytics</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <h3 class="nav-title">
+                            <i class="fas fa-users"></i>
+                            Management
+                        </h3>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="/admin/vouchers.html" class="nav-link">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    <span>Vouchers</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/sessions.html" class="nav-link active">
+                                    <i class="fas fa-wifi"></i>
+                                    <span>Active Sessions</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/customers.html" class="nav-link">
+                                    <i class="fas fa-user-friends"></i>
+                                    <span>Customers</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <h3 class="nav-title">
+                            <i class="fas fa-cog"></i>
+                            System
+                        </h3>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="/admin/settings.html" class="nav-link">
+                                    <i class="fas fa-sliders-h"></i>
+                                    <span>Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-wifi"></i>
+                    Active Sessions
+                </h1>
+                <div class="page-actions">
+                    <button class="btn btn-outline-danger" onclick="disconnectAll()">
+                        <i class="fas fa-power-off"></i>
+                        Disconnect All
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="h3 text-primary mb-1" id="totalSessions">12</div>
+                            <div class="text-muted">Total Sessions</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="h3 text-success mb-1" id="activeSessions">8</div>
+                            <div class="text-muted">Active Now</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="h3 text-warning mb-1" id="expiringSoon">3</div>
+                            <div class="text-muted">Expiring Soon</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="h3 text-info mb-1" id="totalBandwidth">2.4 GB</div>
+                            <div class="text-muted">Total Usage</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-control" id="statusFilter">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="expired">Expired</option>
+                                <option value="disconnected">Disconnected</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Device Type</label>
+                            <select class="form-control" id="deviceFilter">
+                                <option value="">All Devices</option>
+                                <option value="mobile">Mobile</option>
+                                <option value="laptop">Laptop</option>
+                                <option value="tablet">Tablet</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search IP or MAC...">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-outline-primary w-100" onclick="applyFilters()">
+                                <i class="fas fa-search"></i>
+                                Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sessions Table -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-wifi me-2"></i>
+                            Active Sessions
+                        </h5>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-success btn-sm" onclick="exportSessions()">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="refreshSessions()">
+                                <i class="fas fa-sync-alt"></i>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="sessionsTable">
+                            <thead>
+                                <tr>
+                                    <th>Device</th>
+                                    <th>IP Address</th>
+                                    <th>Time Remaining</th>
+                                    <th>Data Usage</th>
+                                    <th>Status</th>
+                                    <th>Connected</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-mobile-alt text-primary fa-lg"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">iPhone 15</div>
+                                                <small class="text-muted">iOS 17.1</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">192.168.1.101</div>
+                                        <small class="text-muted">aa:bb:cc:dd:ee:01</small>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-success">45m 23s</div>
+                                        <div class="progress mt-1" style="height: 4px;">
+                                            <div class="progress-bar bg-success" style="width: 75%"></div>
+                                        </div>
+                                        <small class="text-muted">of 1 hour</small>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">234 MB</div>
+                                        <small class="text-muted">↓ 180MB ↑ 54MB</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-success">
+                                            <span class="status-indicator bg-success"></span>
+                                            Active
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div>2h 15m ago</div>
+                                        <small class="text-muted">11:45 AM</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-info action-btn" onclick="viewSession(1)" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-warning action-btn" onclick="extendSession(1)" title="Extend Time">
+                                                <i class="fas fa-clock"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger action-btn" onclick="disconnectSession(1)" title="Disconnect">
+                                                <i class="fas fa-power-off"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-laptop text-success fa-lg"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">MacBook Pro</div>
+                                                <small class="text-muted">macOS Sonoma</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">192.168.1.102</div>
+                                        <small class="text-muted">aa:bb:cc:dd:ee:02</small>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-primary">22h 45m</div>
+                                        <div class="progress mt-1" style="height: 4px;">
+                                            <div class="progress-bar bg-primary" style="width: 95%"></div>
+                                        </div>
+                                        <small class="text-muted">of 24 hours</small>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">1.2 GB</div>
+                                        <small class="text-muted">↓ 890MB ↑ 310MB</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-success">
+                                            <span class="status-indicator bg-success"></span>
+                                            Active
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div>1h 30m ago</div>
+                                        <small class="text-muted">12:30 PM</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-info action-btn" onclick="viewSession(2)" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-warning action-btn" onclick="extendSession(2)" title="Extend Time">
+                                                <i class="fas fa-clock"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger action-btn" onclick="disconnectSession(2)" title="Disconnect">
+                                                <i class="fas fa-power-off"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-tablet-alt text-warning fa-lg"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">iPad Air</div>
+                                                <small class="text-muted">iPadOS 17</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">192.168.1.103</div>
+                                        <small class="text-muted">aa:bb:cc:dd:ee:03</small>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-warning">5m 12s</div>
+                                        <div class="progress mt-1" style="height: 4px;">
+                                            <div class="progress-bar bg-warning" style="width: 15%"></div>
+                                        </div>
+                                        <small class="text-muted">of 2 hours</small>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">89 MB</div>
+                                        <small class="text-muted">↓ 65MB ↑ 24MB</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-warning">
+                                            <span class="status-indicator bg-warning"></span>
+                                            Expiring
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div>45m ago</div>
+                                        <small class="text-muted">01:15 PM</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-info action-btn" onclick="viewSession(3)" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-warning action-btn" onclick="extendSession(3)" title="Extend Time">
+                                                <i class="fas fa-clock"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger action-btn" onclick="disconnectSession(3)" title="Disconnect">
+                                                <i class="fas fa-power-off"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/universal.js"></script>
+    <script>
+        // Sessions management functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSessions();
+            // Auto-refresh every 10 seconds
+            setInterval(loadSessions, 10000);
+        });
+
+        // Load sessions
+        async function loadSessions() {
+            try {
+                const response = await fetch('/api/admin/sessions');
+                if (response.ok) {
+                    const data = await response.json();
+                    updateSessionsTable(data.sessions);
+                    updateStats(data.stats);
+                }
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+            }
+        }
+
+        // Update sessions table
+        function updateSessionsTable(sessions) {
+            // Implementation would update the table with real data
+        }
+
+        // Update stats
+        function updateStats(stats) {
+            if (stats) {
+                document.getElementById('totalSessions').textContent = stats.total || 0;
+                document.getElementById('activeSessions').textContent = stats.active || 0;
+                document.getElementById('expiringSoon').textContent = stats.expiring || 0;
+                document.getElementById('totalBandwidth').textContent = stats.bandwidth || '0 GB';
+            }
+        }
+
+        // View session details
+        function viewSession(id) {
+            showNotification(`Viewing session ${id}`, 'info');
+        }
+
+        // Extend session
+        async function extendSession(id) {
+            if (!confirm('Extend this session by 1 hour?')) return;
+            
+            try {
+                const response = await fetch(`/api/admin/sessions/${id}/extend`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showNotification('Session extended successfully', 'success');
+                    loadSessions();
+                } else {
+                    showNotification('Error extending session', 'error');
+                }
+            } catch (error) {
+                showNotification('Error extending session', 'error');
+            }
+        }
+
+        // Disconnect session
+        async function disconnectSession(id) {
+            if (!confirm('Disconnect this session?')) return;
+            
+            try {
+                const response = await fetch(`/api/admin/sessions/${id}/disconnect`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showNotification('Session disconnected', 'success');
+                    loadSessions();
+                } else {
+                    showNotification('Error disconnecting session', 'error');
+                }
+            } catch (error) {
+                showNotification('Error disconnecting session', 'error');
+            }
+        }
+
+        // Disconnect all sessions
+        async function disconnectAll() {
+            if (!confirm('Disconnect ALL active sessions? This cannot be undone.')) return;
+            
+            try {
+                const response = await fetch('/api/admin/sessions/disconnect-all', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showNotification('All sessions disconnected', 'success');
+                    loadSessions();
+                } else {
+                    showNotification('Error disconnecting sessions', 'error');
+                }
+            } catch (error) {
+                showNotification('Error disconnecting sessions', 'error');
+            }
+        }
+
+        // Apply filters
+        function applyFilters() {
+            showNotification('Filters applied', 'info');
+        }
+
+        // Export sessions
+        function exportSessions() {
+            showNotification('Exporting sessions...', 'info');
+        }
+
+        // Refresh sessions
+        function refreshSessions() {
+            const refreshBtn = document.querySelector('[onclick="refreshSessions()"]');
+            setLoadingState(refreshBtn, true);
+            
+            loadSessions().finally(() => {
+                setLoadingState(refreshBtn, false);
+                showNotification('Sessions refreshed', 'success');
+            });
+        }
+    </script>
+</body>
+</html>

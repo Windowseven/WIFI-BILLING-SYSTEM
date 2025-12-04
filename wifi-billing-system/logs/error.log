@@ -1,0 +1,4 @@
+{"timestamp":"2025-12-03T19:45:05.125Z","level":"error","message":"Database health check failed","error":""}
+{"timestamp":"2025-12-03T21:51:12.468Z","level":"error","message":"Server error","error":"listen EADDRINUSE: address already in use 0.0.0.0:8080"}
+{"timestamp":"2025-12-03T21:52:03.030Z","level":"error","message":"Server error","error":"listen EADDRINUSE: address already in use 0.0.0.0:8080"}
+{"timestamp":"2025-12-03T21:55:13.224Z","level":"error","message":"Server error","error":"listen EADDRINUSE: address already in use 0.0.0.0:8080"}

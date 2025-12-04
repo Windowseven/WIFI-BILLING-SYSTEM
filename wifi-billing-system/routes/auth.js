@@ -1,27 +1,68 @@
 // routes/auth.js
 const express = require('express');
-const { body } = require('express-validator');
 const authController = require('../controllers/authController');
-const rateLimit = require('express-rate-limit');
+const { validateAuth } = require('../middleware/validation');
 
 const router = express.Router();
 
-// strict rate limiter for login endpoints
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // max 10 attempts per window per IP
-  message: { error: 'Too many login attempts, try again later.' }
-});
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: User login
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 minLength: 3
+ *               password:
+ *                 type: string
+ *                 minLength: 8
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       400:
+ *         description: Invalid credentials
+ *       429:
+ *         description: Too many attempts
+ */
+router.post('/login', validateAuth, authController.login);
 
-router.post(
-  '/login',
-  loginLimiter,
-  body('username').trim().isLength({ min: 3 }),
-  body('password').isLength({ min: 8 }),
-  authController.login
-);
-
+/**
+ * @swagger
+ * /api/auth/refresh:
+ *   post:
+ *     summary: Refresh JWT token
+ *     tags: [Authentication]
+ *     responses:
+ *       200:
+ *         description: Token refreshed
+ *       401:
+ *         description: Invalid token
+ */
 router.post('/refresh', authController.refreshToken);
+
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: User logout
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ */
 router.post('/logout', authController.logout);
 
 module.exports = router;

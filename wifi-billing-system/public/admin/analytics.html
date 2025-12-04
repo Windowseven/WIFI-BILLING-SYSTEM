@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics & Reports - WiFi Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@4.0.0/dist/chart.min.css" rel="stylesheet">
+    <link href="/css/universal.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-container">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="brand-section">
+                        <div class="brand-logo">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                        <div class="brand-text">
+                            <h1 class="brand-title">WiFi Manager</h1>
+                            <span class="brand-subtitle">Professional Edition</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="header-center">
+                    <nav class="breadcrumb-nav">
+                        <i class="fas fa-home"></i>
+                        <span class="breadcrumb-item">Admin</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span class="breadcrumb-current">Analytics</span>
+                    </nav>
+                </div>
+                
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="action-btn" title="Notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                        <button class="action-btn" title="Export Report" onclick="exportReport()">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-avatar" style="background: var(--primary);">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-info">
+                            <span class="user-name">Admin User</span>
+                            <span class="user-role">Administrator</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="main-sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <nav class="sidebar-nav">
+                    <div class="nav-section">
+                        <h3 class="nav-title">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Overview
+                        </h3>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="/admin/dashboard.html" class="nav-link">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/analytics.html" class="nav-link active">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Analytics</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <h3 class="nav-title">
+                            <i class="fas fa-users"></i>
+                            Management
+                        </h3>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="/admin/vouchers.html" class="nav-link">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    <span>Vouchers</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/sessions.html" class="nav-link">
+                                    <i class="fas fa-wifi"></i>
+                                    <span>Active Sessions</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/customers.html" class="nav-link">
+                                    <i class="fas fa-user-friends"></i>
+                                    <span>Customers</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <h3 class="nav-title">
+                            <i class="fas fa-cog"></i>
+                            System
+                        </h3>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="/admin/settings.html" class="nav-link">
+                                    <i class="fas fa-sliders-h"></i>
+                                    <span>Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-chart-line"></i>
+                    Analytics & Reports
+                </h1>
+                <div class="page-actions">
+                    <select class="form-control me-2" id="dateRange" style="width: auto;">
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                        <option value="365">Last year</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="generateReport()">
+                        <i class="fas fa-chart-bar"></i>
+                        Generate Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="h3 text-primary mb-1" id="totalRevenue">$12,450</div>
+                            <div class="text-muted">Total Revenue</div>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up"></i> +15.3%
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="h3 text-success mb-1" id="totalUsers">2,847</div>
+                            <div class="text-muted">Total Users</div>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up"></i> +8.7%
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="h3 text-warning mb-1" id="avgSessionTime">2h 34m</div>
+                            <div class="text-muted">Avg Session Time</div>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up"></i> +12.1%
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="h3 text-info mb-1" id="dataUsage">847 GB</div>
+                            <div class="text-muted">Total Data Usage</div>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up"></i> +22.4%
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Revenue Trend
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="revenueChart" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-chart-pie me-2"></i>
+                                Device Types
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="deviceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usage Analytics -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-clock me-2"></i>
+                                Peak Usage Hours
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="hourlyChart" height="120"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-calendar me-2"></i>
+                                Weekly Patterns
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="weeklyChart" height="120"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Performers -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-trophy me-2"></i>
+                                Top Selling Plans
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>24 Hour Access</strong>
+                                        <br><small class="text-muted">$15.00</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold">456 sold</div>
+                                        <small class="text-success">+18%</small>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>1 Hour Access</strong>
+                                        <br><small class="text-muted">$5.00</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold">324 sold</div>
+                                        <small class="text-success">+12%</small>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>2 Hour Access</strong>
+                                        <br><small class="text-muted">$8.00</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold">198 sold</div>
+                                        <small class="text-warning">-3%</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-users me-2"></i>
+                                Top Customers
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-3" style="background: var(--primary);">
+                                            JD
+                                        </div>
+                                        <div>
+                                            <strong>John Doe</strong>
+                                            <br><small class="text-muted">john.doe@email.com</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold">$245</div>
+                                        <small class="text-muted">16 sessions</small>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-3" style="background: var(--success);">
+                                            JS
+                                        </div>
+                                        <div>
+                                            <strong>Jane Smith</strong>
+                                            <br><small class="text-muted">jane.smith@email.com</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold">$180</div>
+                                        <small class="text-muted">12 sessions</small>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-3" style="background: var(--warning);">
+                                            MB
+                                        </div>
+                                        <div>
+                                            <strong>Mike Brown</strong>
+                                            <br><small class="text-muted">mike.brown@email.com</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold">$125</div>
+                                        <small class="text-muted">8 sessions</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>
+                        Recent Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Event</th>
+                                    <th>User</th>
+                                    <th>Details</th>
+                                    <th>Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2:45 PM</td>
+                                    <td>
+                                        <span class="badge badge-success">
+                                            <i class="fas fa-ticket-alt me-1"></i>
+                                            Voucher Purchased
+                                        </span>
+                                    </td>
+                                    <td>john.doe@email.com</td>
+                                    <td>24 Hour Access</td>
+                                    <td class="fw-bold text-success">+$15.00</td>
+                                </tr>
+                                <tr>
+                                    <td>2:30 PM</td>
+                                    <td>
+                                        <span class="badge badge-info">
+                                            <i class="fas fa-sign-in-alt me-1"></i>
+                                            Session Started
+                                        </span>
+                                    </td>
+                                    <td>192.168.1.105</td>
+                                    <td>Mobile Device</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>2:15 PM</td>
+                                    <td>
+                                        <span class="badge badge-warning">
+                                            <i class="fas fa-sign-out-alt me-1"></i>
+                                            Session Ended
+                                        </span>
+                                    </td>
+                                    <td>192.168.1.103</td>
+                                    <td>Laptop - Time Expired</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>1:58 PM</td>
+                                    <td>
+                                        <span class="badge badge-success">
+                                            <i class="fas fa-ticket-alt me-1"></i>
+                                            Voucher Purchased
+                                        </span>
+                                    </td>
+                                    <td>jane.smith@email.com</td>
+                                    <td>2 Hour Access</td>
+                                    <td class="fw-bold text-success">+$8.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/universal.js"></script>
+    <script>
+        // Analytics functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadAnalytics();
+        });
+
+        // Initialize charts
+        function initializeCharts() {
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart');
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [2800, 3200, 2900, 3500],
+                        borderColor: 'rgb(37, 99, 235)',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Device Chart
+            const deviceCtx = document.getElementById('deviceChart');
+            new Chart(deviceCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Mobile', 'Laptop', 'Tablet', 'Desktop'],
+                    datasets: [{
+                        data: [45, 30, 15, 10],
+                        backgroundColor: [
+                            'rgb(37, 99, 235)',
+                            'rgb(16, 185, 129)',
+                            'rgb(245, 158, 11)',
+                            'rgb(139, 92, 246)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // Hourly Chart
+            const hourlyCtx = document.getElementById('hourlyChart');
+            new Chart(hourlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['6AM', '9AM', '12PM', '3PM', '6PM', '9PM'],
+                    datasets: [{
+                        label: 'Users',
+                        data: [12, 45, 78, 92, 156, 89],
+                        backgroundColor: 'rgba(37, 99, 235, 0.8)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Weekly Chart
+            const weeklyCtx = document.getElementById('weeklyChart');
+            new Chart(weeklyCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Sessions',
+                        data: [65, 78, 82, 95, 120, 145, 98],
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // Load analytics data
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/api/admin/analytics');
+                if (response.ok) {
+                    const data = await response.json();
+                    updateAnalytics(data);
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        // Update analytics display
+        function updateAnalytics(data) {
+            if (data) {
+                document.getElementById('totalRevenue').textContent = '$' + (data.totalRevenue || '12,450');
+                document.getElementById('totalUsers').textContent = data.totalUsers || '2,847';
+                document.getElementById('avgSessionTime').textContent = data.avgSessionTime || '2h 34m';
+                document.getElementById('dataUsage').textContent = data.dataUsage || '847 GB';
+            }
+        }
+
+        // Generate report
+        function generateReport() {
+            const dateRange = document.getElementById('dateRange').value;
+            const generateBtn = document.querySelector('[onclick="generateReport()"]');
+            setLoadingState(generateBtn, true);
+            
+            setTimeout(() => {
+                setLoadingState(generateBtn, false);
+                showNotification(`Report generated for last ${dateRange} days`, 'success');
+            }, 2000);
+        }
+
+        // Export report
+        function exportReport() {
+            showNotification('Exporting analytics report...', 'info');
+            // Implementation would generate and download report
+        }
+
+        // Date range change handler
+        document.getElementById('dateRange').addEventListener('change', function() {
+            loadAnalytics();
+        });
+    </script>
+</body>
+</html>

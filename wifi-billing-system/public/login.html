@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Access - Windowseven Network</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="/css/universal.css" rel="stylesheet">
+    <style>
+        /* Customer Portal Specific Styles */
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--info) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .portal-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .portal-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .portal-header {
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .brand-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 20px 40px rgba(37, 99, 235, 0.3);
+            position: relative;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .brand-logo::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+            border-radius: 20px;
+            pointer-events: none;
+        }
+
+        .wifi-icon {
+            font-size: 3rem;
+            color: white;
+            animation: wifiPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes wifiPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .brand-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .brand-subtitle {
+            color: var(--gray-500);
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+        }
+
+        .network-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            border: 2px solid rgba(16, 185, 129, 0.2);
+            animation: statusGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes statusGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+        }
+
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        .voucher-form {
+            padding: 0 2rem 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-control {
+            border: 2px solid #e5e7eb;
+            border-radius: var(--radius-xl);
+            padding: 1.25rem 1.5rem;
+            font-size: 1.1rem;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .captive-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-2xl);
+            max-width: 480px;
+            width: 100%;
+            margin: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .captive-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .brand-header {
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+        }
+
+        .brand-logo {
+            width: 100px;
+            height: 100px;
+            background: var(--gradient-primary);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+            position: relative;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .brand-logo::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+            border-radius: 20px;
+            pointer-events: none;
+        }
+
+        .wifi-icon {
+            font-size: 3rem;
+            color: white;
+            animation: wifiPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes wifiPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .brand-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .brand-subtitle {
+            color: var(--gray-500);
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+        }
+
+        .network-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            border: 2px solid rgba(16, 185, 129, 0.2);
+            animation: statusGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes statusGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+        }
+
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        .voucher-form {
+            padding: 0 2rem 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-control {
+            border: 2px solid #e5e7eb;
+            border-radius: var(--radius-xl);
+            padding: 1.25rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            background: var(--gray-50);
+            transition: all 0.3s ease;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: white;
+            outline: none;
+            transform: translateY(-2px);
+        }
+
+        .btn-connect {
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: var(--radius-xl);
+            padding: 1.25rem 2rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-connect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-connect:hover::before {
+            left: 100%;
+        }
+
+        .btn-connect:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-connect:active {
+            transform: translateY(-1px);
+        }
+
+        .features-section {
+            padding: 1.5rem 2rem 2rem;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: var(--radius-lg);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.2);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-weight: 700;
+            color: var(--gray-900);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-desc {
+            color: var(--gray-500);
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .qr-scanner {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .qr-btn {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: var(--radius-lg);
+            padding: 0.75rem 1.5rem;
+            color: var(--primary);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .qr-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Success Modal */
+        .modal-content {
+            border: none;
+            border-radius: var(--radius-2xl);
+            overflow: hidden;
+        }
+
+        .success-animation {
+            width: 120px;
+            height: 120px;
+            background: var(--gradient-success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            animation: successPulse 0.6s ease-out;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .session-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .session-card {
+            background: var(--gray-50);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .session-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .session-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .session-label {
+            color: var(--gray-500);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Dark Theme Support */
+        @media (prefers-color-scheme: dark) {
+            .captive-container {
+                background: rgba(17, 24, 39, 0.95);
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            .brand-title {
+                color: white;
+            }
+            
+            .form-control {
+                background: rgba(55, 65, 81, 0.5);
+                border-color: rgba(75, 85, 99, 0.5);
+                color: white;
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .captive-container {
+                margin: 1rem;
+                max-width: 100%;
+            }
+            
+            .brand-header {
+                padding: 2rem 1.5rem 1.5rem;
+            }
+            
+            .voucher-form {
+                padding: 0 1.5rem 1.5rem;
+            }
+            
+            .features-section {
+                padding: 1rem 1.5rem 1.5rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            
+            .brand-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="captive-container">
+        <div class="brand-header">
+            <div class="brand-logo">
+                <i class="fas fa-wifi wifi-icon"></i>
+            </div>
+            <h1 class="brand-title">Windowseven WiFi</h1>
+            <p class="brand-subtitle">Premium Network Access Portal</p>
+            <div class="network-status">
+                <div class="pulse-dot"></div>
+                Network Online & Ready
+            </div>
+        </div>
+
+        <form id="voucherForm" class="voucher-form">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-ticket-alt" style="color: var(--primary);"></i>
+                    Enter Your Voucher Code
+                </label>
+                <input type="text" class="form-control" id="voucher" 
+                       placeholder="XXXXXXXX" required maxlength="12" autocomplete="off">
+                <div class="invalid-feedback"></div>
+            </div>
+            
+            <button type="submit" class="btn btn-connect" id="connectBtn">
+                <i class="fas fa-rocket me-2"></i>
+                Connect to Internet
+            </button>
+
+            <div class="qr-scanner">
+                <button type="button" class="btn qr-btn" onclick="openQRScanner()">
+                    <i class="fas fa-qrcode me-2"></i>
+                    Scan QR Code
+                </button>
+            </div>
+        </form>
+
+        <div class="features-section">
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="feature-title">Ultra Fast</div>
+                    <div class="feature-desc">High-speed fiber connection up to 1Gbps</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="feature-title">Secure</div>
+                    <div class="feature-desc">Enterprise-grade WPA3 security</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="feature-title">24/7 Access</div>
+                    <div class="feature-desc">Always available network access</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-5">
+                    <div class="success-animation">
+                        <i class="fas fa-check fa-4x text-white"></i>
+                    </div>
+                    <h2 class="fw-bold text-success mb-3">Welcome to the Internet!</h2>
+                    <p class="text-muted mb-4">Your connection has been established successfully</p>
+                    
+                    <div class="session-info" id="sessionInfo">
+                        <!-- Session details will be populated here -->
+                    </div>
+                    
+                    <button type="button" class="btn btn-success btn-lg px-5" 
+                            style="border-radius: var(--radius-xl); font-weight: 700;" 
+                            onclick="window.open('https://google.com', '_blank')">
+                        <i class="fas fa-globe me-2"></i>
+                        Start Browsing
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Voucher form submission
+        document.getElementById('voucherForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const voucher = document.getElementById('voucher').value.trim().toUpperCase();
+            const connectBtn = document.getElementById('connectBtn');
+            const voucherInput = document.getElementById('voucher');
+            
+            if (!voucher) {
+                showError('Please enter a voucher code');
+                return;
+            }
+            
+            // Show loading state
+            connectBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Connecting...';
+            connectBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/voucher/redeem', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ voucher_code: voucher })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Show session info
+                    document.getElementById('sessionInfo').innerHTML = `
+                        <div class="session-card">
+                            <div class="session-value">${data.session.duration_minutes}m</div>
+                            <div class="session-label">Duration</div>
+                        </div>
+                        <div class="session-card">
+                            <div class="session-value">${data.session.data_limit_mb || '∞'}</div>
+                            <div class="session-label">Data Limit</div>
+                        </div>
+                        <div class="session-card">
+                            <div class="session-value">${data.session.client_ip}</div>
+                            <div class="session-label">Your IP</div>
+                        </div>
+                    `;
+                    
+                    // Show success modal
+                    new bootstrap.Modal(document.getElementById('successModal')).show();
+                } else {
+                    showError(data.message || 'Invalid voucher code');
+                    voucherInput.classList.add('is-invalid');
+                    voucherInput.nextElementSibling.textContent = data.message || 'Invalid voucher code';
+                }
+            } catch (error) {
+                showError('Connection error. Please try again.');
+            } finally {
+                // Reset button
+                connectBtn.innerHTML = '<i class="fas fa-rocket me-2"></i>Connect to Internet';
+                connectBtn.disabled = false;
+            }
+        });
+        
+        // Error handling
+        function showError(message) {
+            // Create toast notification
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed top-0 end-0 p-3';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <div class="toast show" role="alert">
+                    <div class="toast-header bg-danger text-white">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong class="me-auto">Error</strong>
+                        <button type="button" class="btn-close btn-close-white" onclick="this.closest('.toast').remove()"></button>
+                    </div>
+                    <div class="toast-body">${message}</div>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => toast.remove(), 5000);
+        }
+        
+        // Input formatting
+        document.getElementById('voucher').addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+            let value = this.value.replace(/[^A-Z0-9]/g, '');
+            if (value.length > 8) {
+                value = value.substring(0, 8);
+            }
+            this.value = value;
+        });
+        
+        // QR Scanner (placeholder function)
+        function openQRScanner() {
+            alert('QR Scanner feature will be implemented with camera access. For now, please enter the voucher code manually.');
+        }
+        
+        // Auto-focus on voucher input
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('voucher').focus();
+        });
+    </script>
+</body>
+</html>

@@ -1,115 +1,148 @@
-// controllers/hotspotAuth.js
-// Hotspot Authentication & Middleware for WiFi Billing System
-// Handles: voucher login, session validation, hotspot accounting, middleware protection
+const express = require('express');
+const router = express.Router();
+const jwt = require('jsonwebtoken');
+const db = require('../config/db');
 
-const db = require('../config/db'); // assume MySQL pool
-const { validationResult } = require('express-validator');
-const crypto = require('crypto');
-
-/**
- * Middleware to protect hotspot accounting & admin routes
- * Ensures request has valid shared secret or token
- */
-const hotspotMiddleware = (req, res, next) => {
+// Middleware to authenticate voucher codes
+const authenticateVoucher = async (req, res, next) => {
     try {
-        const secret = req.headers['x-hotspot-secret'];
-        if (!secret || secret !== process.env.HOTSPOT_SHARED_SECRET) {
-            return res.status(403).json({ error: 'Unauthorized hotspot request' });
+        const { voucherCode } = req.body;
+        
+        if (!voucherCode) {
+            return res.status(400).json({ error: 'Voucher code is required' });
         }
+
+        // Check if voucher exists and is valid
+        const [vouchers] = await db.execute(
+            'SELECT * FROM vouchers WHERE code = ? AND status = "active" AND expires_at > NOW()',
+            [voucherCode]
+        );
+
+        if (vouchers.length === 0) {
+            return res.status(401).json({ error: 'Invalid or expired voucher code' });
+        }
+
+        const voucher = vouchers[0];
+        
+        // Check if voucher has remaining time
+        if (voucher.remaining_time <= 0) {
+            return res.status(401).json({ error: 'Voucher has no remaining time' });
+        }
+
+        req.voucher = voucher;
         next();
-    } catch (err) {
-        console.error('Hotspot middleware error:', err);
+    } catch (error) {
+        console.error('Voucher authentication error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
 
-/**
- * Authenticate voucher for device login (captive portal)
- * Body: voucher_code, mac_address, ip
- */
-const authenticateVoucher = async (req, res) => {
+// Hotspot login endpoint
+router.post('/login', authenticateVoucher, async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+        const voucher = req.voucher;
+        const clientMac = req.body.mac || req.headers['x-client-mac'];
+        const clientIp = req.ip || req.connection.remoteAddress;
 
-        const { voucher_code, mac_address, ip } = req.body;
-
-        // Find voucher in DB
-        const [voucherRows] = await db.query(
-            'SELECT * FROM vouchers WHERE code = ? AND status = "active"',
-            [voucher_code]
+        // Create session
+        const sessionToken = jwt.sign(
+            { 
+                voucherId: voucher.id,
+                mac: clientMac,
+                ip: clientIp
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: `${voucher.remaining_time}m` }
         );
 
-        if (!voucherRows.length) {
-            return res.status(404).json({ error: 'Voucher not found or inactive' });
-        }
-
-        const voucher = voucherRows[0];
-
-        // Create session token
-        const session_token = crypto.randomBytes(24).toString('hex');
-        const now = new Date();
-        const expires_at = new Date(now.getTime() + voucher.duration_minutes * 60000);
-
-        // Insert session into DB
-        await db.query(
-            `INSERT INTO sessions (voucher_id, mac_address, ip, session_token, expires_at, status)
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [voucher.id, mac_address, ip, session_token, expires_at, 'active']
+        // Update voucher usage
+        await db.execute(
+            'UPDATE vouchers SET last_used = NOW() WHERE id = ?',
+            [voucher.id]
         );
 
-        // Mark voucher as used
-        await db.query('UPDATE vouchers SET status="used" WHERE id=?', [voucher.id]);
+        // Create session record
+        await db.execute(
+            'INSERT INTO sessions (voucher_id, mac_address, ip_address, session_token, expires_at) VALUES (?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))',
+            [voucher.id, clientMac, clientIp, sessionToken, voucher.remaining_time]
+        );
 
         res.json({
-            message: 'Access granted',
-            session_token,
-            expires_at
+            success: true,
+            sessionToken,
+            expiresIn: voucher.remaining_time * 60, // in seconds
+            message: 'Authentication successful'
         });
-    } catch (err) {
-        console.error('authenticateVoucher error:', err);
+    } catch (error) {
+        console.error('Hotspot login error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
-};
+});
 
-/**
- * Validate an active session
- * Query: session_token, mac_address
- */
-const validateSession = async (req, res) => {
+// Session validation endpoint
+router.post('/validate', async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+        const { sessionToken } = req.body;
+        
+        if (!sessionToken) {
+            return res.status(400).json({ error: 'Session token is required' });
+        }
 
-        const { session_token, mac_address } = req.query;
-
-        const [rows] = await db.query(
-            'SELECT * FROM sessions WHERE session_token=? AND mac_address=? AND status="active"',
-            [session_token, mac_address]
+        // Verify JWT token
+        const decoded = jwt.verify(sessionToken, process.env.JWT_SECRET);
+        
+        // Check if session exists in database
+        const [sessions] = await db.execute(
+            'SELECT * FROM sessions WHERE session_token = ? AND expires_at > NOW() AND status = "active"',
+            [sessionToken]
         );
 
-        if (!rows.length) {
-            return res.json({ access: false });
+        if (sessions.length === 0) {
+            return res.status(401).json({ error: 'Invalid or expired session' });
         }
 
-        const session = rows[0];
-        const now = new Date();
+        const session = sessions[0];
+        
+        // Update last activity
+        await db.execute(
+            'UPDATE sessions SET last_activity = NOW() WHERE id = ?',
+            [session.id]
+        );
 
-        if (now > session.expires_at) {
-            // Expire session
-            await db.query('UPDATE sessions SET status="expired" WHERE id=?', [session.id]);
-            return res.json({ access: false });
+        res.json({
+            valid: true,
+            session: {
+                id: session.id,
+                voucherId: session.voucher_id,
+                expiresAt: session.expires_at
+            }
+        });
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ error: 'Invalid session token' });
         }
-
-        res.json({ access: true, expires_at: session.expires_at });
-    } catch (err) {
-        console.error('validateSession error:', err);
+        console.error('Session validation error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
-};
+});
 
-module.exports = {
-    hotspotMiddleware,        // middleware for protected routes
-    authenticateVoucher,      // voucher login handler
-    validateSession           // session validation
-};
+// Logout endpoint
+router.post('/logout', async (req, res) => {
+    try {
+        const { sessionToken } = req.body;
+        
+        if (sessionToken) {
+            await db.execute(
+                'UPDATE sessions SET status = "terminated", ended_at = NOW() WHERE session_token = ?',
+                [sessionToken]
+            );
+        }
+
+        res.json({ success: true, message: 'Logged out successfully' });
+    } catch (error) {
+        console.error('Logout error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+module.exports = router;

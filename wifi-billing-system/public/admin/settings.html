@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Settings - WiFi Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="/css/universal.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-container">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="brand-section">
+                        <div class="brand-logo">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                        <div class="brand-text">
+                            <h1 class="brand-title">WiFi Manager</h1>
+                            <span class="brand-subtitle">Professional Edition</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="header-center">
+                    <nav class="breadcrumb-nav">
+                        <i class="fas fa-home"></i>
+                        <span class="breadcrumb-item">Admin</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span class="breadcrumb-current">Settings</span>
+                    </nav>
+                </div>
+                
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="action-btn" title="Notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                        <button class="action-btn" title="Help">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-avatar" style="background: var(--primary);">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-info">
+                            <span class="user-name">Admin User</span>
+                            <span class="user-role">Administrator</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="main-sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <nav class="sidebar-nav">
+                    <div class="nav-section">
+                        <h3 class="nav-title">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Overview
+                        </h3>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="/admin/dashboard.html" class="nav-link">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/analytics.html" class="nav-link">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Analytics</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <h3 class="nav-title">
+                            <i class="fas fa-users"></i>
+                            Management
+                        </h3>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="/admin/vouchers.html" class="nav-link">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    <span>Vouchers</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/sessions.html" class="nav-link">
+                                    <i class="fas fa-wifi"></i>
+                                    <span>Active Sessions</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/customers.html" class="nav-link">
+                                    <i class="fas fa-user-friends"></i>
+                                    <span>Customers</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="nav-section">
+                        <h3 class="nav-title">
+                            <i class="fas fa-cog"></i>
+                            System
+                        </h3>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="/admin/settings.html" class="nav-link active">
+                                    <i class="fas fa-sliders-h"></i>
+                                    <span>Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-sliders-h"></i>
+                    System Settings
+                </h1>
+                <div class="page-actions">
+                    <button class="btn btn-success" onclick="saveAllSettings()">
+                        <i class="fas fa-save"></i>
+                        Save All Changes
+                    </button>
+                </div>
+            </div>
+
+            <!-- Settings Tabs -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div class="nav nav-pills flex-column" id="settings-tabs">
+                                <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#general-settings">
+                                    <i class="fas fa-cog me-2"></i>
+                                    General
+                                </button>
+                                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#network-settings">
+                                    <i class="fas fa-wifi me-2"></i>
+                                    Network
+                                </button>
+                                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#pricing-settings">
+                                    <i class="fas fa-dollar-sign me-2"></i>
+                                    Pricing
+                                </button>
+                                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#security-settings">
+                                    <i class="fas fa-shield-alt me-2"></i>
+                                    Security
+                                </button>
+                                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#email-settings">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    Email
+                                </button>
+                                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#backup-settings">
+                                    <i class="fas fa-database me-2"></i>
+                                    Backup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-9">
+                    <div class="tab-content">
+                        <!-- General Settings -->
+                        <div class="tab-pane fade show active" id="general-settings">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-cog me-2"></i>
+                                        General Settings
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">System Name</label>
+                                            <input type="text" class="form-control" value="Windowseven Network" id="systemName">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Admin Email</label>
+                                            <input type="email" class="form-control" value="admin@windowseven.com" id="adminEmail">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Timezone</label>
+                                            <select class="form-control" id="timezone">
+                                                <option value="UTC">UTC</option>
+                                                <option value="America/New_York" selected>Eastern Time</option>
+                                                <option value="America/Chicago">Central Time</option>
+                                                <option value="America/Denver">Mountain Time</option>
+                                                <option value="America/Los_Angeles">Pacific Time</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Currency</label>
+                                            <select class="form-control" id="currency">
+                                                <option value="USD" selected>USD ($)</option>
+                                                <option value="EUR">EUR (€)</option>
+                                                <option value="GBP">GBP (£)</option>
+                                                <option value="CAD">CAD ($)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Welcome Message</label>
+                                            <textarea class="form-control" rows="3" id="welcomeMessage">Welcome to Windowseven Network! Enjoy high-speed internet access.</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Network Settings -->
+                        <div class="tab-pane fade" id="network-settings">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-wifi me-2"></i>
+                                        Network Configuration
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Hotspot IP</label>
+                                            <input type="text" class="form-control" value="192.168.1.1" id="hotspotIP">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Hotspot Port</label>
+                                            <input type="number" class="form-control" value="3990" id="hotspotPort">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">RADIUS Server</label>
+                                            <input type="text" class="form-control" value="localhost" id="radiusServer">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">RADIUS Port</label>
+                                            <input type="number" class="form-control" value="1812" id="radiusPort">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">RADIUS Secret</label>
+                                            <input type="password" class="form-control" value="testing123" id="radiusSecret">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Session Timeout (minutes)</label>
+                                            <input type="number" class="form-control" value="60" id="sessionTimeout">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pricing Settings -->
+                        <div class="tab-pane fade" id="pricing-settings">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-dollar-sign me-2"></i>
+                                            Pricing Plans (TSh - Tanzanian Shilling)
+                                        </h5>
+                                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPlanModal">
+                                            <i class="fas fa-plus"></i>
+                                            Add Plan
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table" id="plansTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Plan Name</th>
+                                                    <th>Duration</th>
+                                                    <th>Data Limit</th>
+                                                    <th>Price (TSh)</th>
+                                                    <th>Price per MB</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>500MB - 1 Hour</td>
+                                                    <td>60 minutes</td>
+                                                    <td>500 MB</td>
+                                                    <td>TSh 12,000</td>
+                                                    <td>TSh 24/MB</td>
+                                                    <td><span class="badge badge-success">Active</span></td>
+                                                    <td>
+                                                        <button class="btn btn-outline-primary btn-sm" onclick="editPlan(1)">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>1GB - 2 Hours</td>
+                                                    <td>120 minutes</td>
+                                                    <td>1 GB</td>
+                                                    <td>TSh 20,000</td>
+                                                    <td>TSh 19.5/MB</td>
+                                                    <td><span class="badge badge-success">Active</span></td>
+                                                    <td>
+                                                        <button class="btn btn-outline-primary btn-sm" onclick="editPlan(2)">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2GB - 24 Hours</td>
+                                                    <td>1440 minutes</td>
+                                                    <td>2 GB</td>
+                                                    <td>TSh 35,000</td>
+                                                    <td>TSh 17.1/MB</td>
+                                                    <td><span class="badge badge-success">Active</span></td>
+                                                    <td>
+                                                        <button class="btn btn-outline-primary btn-sm" onclick="editPlan(3)">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>5GB - Weekly</td>
+                                                    <td>10080 minutes</td>
+                                                    <td>5 GB</td>
+                                                    <td>TSh 75,000</td>
+                                                    <td>TSh 14.6/MB</td>
+                                                    <td><span class="badge badge-success">Active</span></td>
+                                                    <td>
+                                                        <button class="btn btn-outline-primary btn-sm" onclick="editPlan(4)">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security Settings -->
+                        <div class="tab-pane fade" id="security-settings">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-shield-alt me-2"></i>
+                                        Security Settings
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="enableSSL" checked>
+                                                <label class="form-check-label" for="enableSSL">
+                                                    Enable SSL/HTTPS
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="enableFirewall" checked>
+                                                <label class="form-check-label" for="enableFirewall">
+                                                    Enable Firewall Protection
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="enableRateLimit" checked>
+                                                <label class="form-check-label" for="enableRateLimit">
+                                                    Enable Rate Limiting
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Max Login Attempts</label>
+                                            <input type="number" class="form-control" value="5" id="maxLoginAttempts">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Lockout Duration (minutes)</label>
+                                            <input type="number" class="form-control" value="15" id="lockoutDuration">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Allowed IP Ranges (one per line)</label>
+                                            <textarea class="form-control" rows="3" id="allowedIPs">192.168.1.0/24
+10.0.0.0/8</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email Settings -->
+                        <div class="tab-pane fade" id="email-settings">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-envelope me-2"></i>
+                                        Email Configuration
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">SMTP Server</label>
+                                            <input type="text" class="form-control" value="smtp.gmail.com" id="smtpServer">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">SMTP Port</label>
+                                            <input type="number" class="form-control" value="587" id="smtpPort">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Username</label>
+                                            <input type="text" class="form-control" value="admin@windowseven.com" id="smtpUsername">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Password</label>
+                                            <input type="password" class="form-control" id="smtpPassword">
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="enableTLS" checked>
+                                                <label class="form-check-label" for="enableTLS">
+                                                    Enable TLS/SSL
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <button class="btn btn-outline-primary" onclick="testEmail()">
+                                                <i class="fas fa-paper-plane"></i>
+                                                Send Test Email
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Backup Settings -->
+                        <div class="tab-pane fade" id="backup-settings">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-database me-2"></i>
+                                        Backup & Restore
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="autoBackup" checked>
+                                                <label class="form-check-label" for="autoBackup">
+                                                    Enable Automatic Backups
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Backup Frequency</label>
+                                            <select class="form-control" id="backupFrequency">
+                                                <option value="daily" selected>Daily</option>
+                                                <option value="weekly">Weekly</option>
+                                                <option value="monthly">Monthly</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Retention Period (days)</label>
+                                            <input type="number" class="form-control" value="30" id="retentionPeriod">
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-primary" onclick="createBackup()">
+                                                    <i class="fas fa-download"></i>
+                                                    Create Backup Now
+                                                </button>
+                                                <button class="btn btn-outline-primary" onclick="restoreBackup()">
+                                                    <i class="fas fa-upload"></i>
+                                                    Restore from Backup
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <h6>Recent Backups</h6>
+                                            <div class="list-group">
+                                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <strong>backup_2024-12-04.sql</strong>
+                                                        <br><small class="text-muted">Created: Dec 4, 2024 at 2:00 AM</small>
+                                                    </div>
+                                                    <div>
+                                                        <button class="btn btn-outline-primary btn-sm me-2">
+                                                            <i class="fas fa-download"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-danger btn-sm">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Add Plan Modal -->
+    <div class="modal fade" id="addPlanModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Add New Plan
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addPlanForm">
+                        <div class="mb-3">
+                            <label class="form-label">Plan Name</label>
+                            <input type="text" class="form-control" id="planName" placeholder="e.g., 1GB - 2 Hours" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Duration (minutes)</label>
+                                    <input type="number" class="form-control" id="planDuration" min="1" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Data Limit (MB)</label>
+                                    <input type="number" class="form-control" id="planDataLimit" min="1" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Price (TSh)</label>
+                            <input type="number" class="form-control" id="planPrice" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Price per MB:</strong> <span id="pricePerMB">TSh 0</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="savePlan()">
+                        <i class="fas fa-save"></i>
+                        Save Plan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/universal.js"></script>
+    <script>
+        // Settings management functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+        });
+
+        // Load settings
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/admin/settings');
+                if (response.ok) {
+                    const settings = await response.json();
+                    populateSettings(settings);
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        // Populate settings form
+        function populateSettings(settings) {
+            // Implementation would populate form fields with actual settings
+        }
+
+        // Save all settings
+        async function saveAllSettings() {
+            const saveBtn = document.querySelector('[onclick="saveAllSettings()"]');
+            setLoadingState(saveBtn, true);
+
+            try {
+                const settings = gatherAllSettings();
+                const response = await fetch('/api/admin/settings', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(settings)
+                });
+
+                if (response.ok) {
+                    showNotification('Settings saved successfully', 'success');
+                } else {
+                    showNotification('Error saving settings', 'error');
+                }
+            } catch (error) {
+                showNotification('Error saving settings', 'error');
+            } finally {
+                setLoadingState(saveBtn, false);
+            }
+        }
+
+        // Gather all settings
+        function gatherAllSettings() {
+            return {
+                general: {
+                    systemName: document.getElementById('systemName').value,
+                    adminEmail: document.getElementById('adminEmail').value,
+                    timezone: document.getElementById('timezone').value,
+                    currency: document.getElementById('currency').value,
+                    welcomeMessage: document.getElementById('welcomeMessage').value
+                },
+                network: {
+                    hotspotIP: document.getElementById('hotspotIP').value,
+                    hotspotPort: document.getElementById('hotspotPort').value,
+                    radiusServer: document.getElementById('radiusServer').value,
+                    radiusPort: document.getElementById('radiusPort').value,
+                    radiusSecret: document.getElementById('radiusSecret').value,
+                    sessionTimeout: document.getElementById('sessionTimeout').value
+                },
+                security: {
+                    enableSSL: document.getElementById('enableSSL').checked,
+                    enableFirewall: document.getElementById('enableFirewall').checked,
+                    enableRateLimit: document.getElementById('enableRateLimit').checked,
+                    maxLoginAttempts: document.getElementById('maxLoginAttempts').value,
+                    lockoutDuration: document.getElementById('lockoutDuration').value,
+                    allowedIPs: document.getElementById('allowedIPs').value
+                },
+                email: {
+                    smtpServer: document.getElementById('smtpServer').value,
+                    smtpPort: document.getElementById('smtpPort').value,
+                    smtpUsername: document.getElementById('smtpUsername').value,
+                    smtpPassword: document.getElementById('smtpPassword').value,
+                    enableTLS: document.getElementById('enableTLS').checked
+                },
+                backup: {
+                    autoBackup: document.getElementById('autoBackup').checked,
+                    backupFrequency: document.getElementById('backupFrequency').value,
+                    retentionPeriod: document.getElementById('retentionPeriod').value
+                }
+            };
+        }
+
+        // Test email
+        async function testEmail() {
+            const testBtn = document.querySelector('[onclick="testEmail()"]');
+            setLoadingState(testBtn, true);
+
+            try {
+                const response = await fetch('/api/admin/test-email', {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    showNotification('Test email sent successfully', 'success');
+                } else {
+                    showNotification('Failed to send test email', 'error');
+                }
+            } catch (error) {
+                showNotification('Error sending test email', 'error');
+            } finally {
+                setLoadingState(testBtn, false);
+            }
+        }
+
+        // Create backup
+        async function createBackup() {
+            const backupBtn = document.querySelector('[onclick="createBackup()"]');
+            setLoadingState(backupBtn, true);
+
+            try {
+                const response = await fetch('/api/admin/backup', {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    showNotification('Backup created successfully', 'success');
+                } else {
+                    showNotification('Error creating backup', 'error');
+                }
+            } catch (error) {
+                showNotification('Error creating backup', 'error');
+            } finally {
+                setLoadingState(backupBtn, false);
+            }
+        }
+
+        // Restore backup
+        function restoreBackup() {
+            if (!confirm('This will restore the system from a backup. All current data will be replaced. Continue?')) {
+                return;
+            }
+            showNotification('Restore functionality would be implemented here', 'info');
+        }
+
+        // Add plan
+        function addPlan() {
+            showNotification('Add plan functionality would be implemented here', 'info');
+        }
+
+        // Calculate price per MB
+        function calculatePricePerMB() {
+            const price = document.getElementById('planPrice').value;
+            const dataLimit = document.getElementById('planDataLimit').value;
+            
+            if (price && dataLimit) {
+                const pricePerMB = Math.round((price / dataLimit) * 100) / 100;
+                document.getElementById('pricePerMB').textContent = `TSh ${pricePerMB}`;
+            } else {
+                document.getElementById('pricePerMB').textContent = 'TSh 0';
+            }
+        }
+
+        // Add event listeners for price calculation
+        document.addEventListener('DOMContentLoaded', function() {
+            const priceInput = document.getElementById('planPrice');
+            const dataInput = document.getElementById('planDataLimit');
+            
+            if (priceInput && dataInput) {
+                priceInput.addEventListener('input', calculatePricePerMB);
+                dataInput.addEventListener('input', calculatePricePerMB);
+            }
+        });
+
+        // Save plan
+        async function savePlan() {
+            const form = document.getElementById('addPlanForm');
+            const name = document.getElementById('planName').value;
+            const duration = document.getElementById('planDuration').value;
+            const dataLimit = document.getElementById('planDataLimit').value;
+            const price = document.getElementById('planPrice').value;
+
+            if (!name || !duration || !dataLimit || !price) {
+                showNotification('Please fill in all fields', 'warning');
+                return;
+            }
+
+            const saveBtn = document.querySelector('[onclick="savePlan()"]');
+            setLoadingState(saveBtn, true);
+
+            try {
+                const response = await fetch('/api/admin/plans', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, duration: parseInt(duration), dataLimit: parseInt(dataLimit), price: parseInt(price) })
+                });
+
+                if (response.ok) {
+                    showNotification('Plan created successfully', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('addPlanModal')).hide();
+                    form.reset();
+                    loadPlans();
+                } else {
+                    showNotification('Error creating plan', 'error');
+                }
+            } catch (error) {
+                showNotification('Error creating plan', 'error');
+            } finally {
+                setLoadingState(saveBtn, false);
+            }
+        }
+
+        // Edit plan
+        function editPlan(id) {
+            showNotification(`Edit plan ${id} functionality would be implemented here`, 'info');
+        }
+
+        // Load plans
+        async function loadPlans() {
+            try {
+                const response = await fetch('/api/admin/plans');
+                if (response.ok) {
+                    const data = await response.json();
+                    updatePlansTable(data.plans);
+                }
+            } catch (error) {
+                console.error('Error loading plans:', error);
+            }
+        }
+
+        // Update plans table
+        function updatePlansTable(plans) {
+            const tbody = document.querySelector('#plansTable tbody');
+            if (!plans || plans.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4">No plans found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = plans.map(plan => `
+                <tr>
+                    <td>${plan.name}</td>
+                    <td>${plan.duration} minutes</td>
+                    <td>${plan.dataLimit >= 1024 ? (plan.dataLimit / 1024).toFixed(1) + ' GB' : plan.dataLimit + ' MB'}</td>
+                    <td>TSh ${plan.price.toLocaleString()}</td>
+                    <td>TSh ${plan.pricePerMB}/MB</td>
+                    <td><span class="badge badge-${plan.status === 'active' ? 'success' : 'secondary'}">${plan.status}</span></td>
+                    <td>
+                        <button class="btn btn-outline-primary btn-sm" onclick="editPlan(${plan.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

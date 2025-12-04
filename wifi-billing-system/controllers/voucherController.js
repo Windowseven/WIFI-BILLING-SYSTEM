@@ -77,23 +77,38 @@ exports.getByCode = async (req, res) => {
 };
 
 /* =========================================================
-   REDEEM VOUCHER
+   REDEEM VOUCHER (Updated for Captive Portal)
 ========================================================= */
 exports.redeem = async (req, res) => {
     try {
-        const { code, mac_address } = req.body;
+        const { voucher_code } = req.body;
+        const client_ip = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'];
+        const mac_address = req.body.mac_address || 'unknown';
         
         // Find and validate voucher
         const [vouchers] = await db.query(
             'SELECT * FROM vouchers WHERE code = ? AND status = "active" AND (expiry_date IS NULL OR expiry_date > NOW())',
-            [code]
+            [voucher_code]
         );
         
         if (vouchers.length === 0) {
-            return res.status(404).json({ error: 'Invalid or expired voucher code' });
+            return res.status(400).json({ 
+                success: false,
+                message: 'Invalid or expired voucher code' 
+            });
         }
         
         const voucher = vouchers[0];
+        
+        // Create session record
+        const session_id = crypto.randomBytes(16).toString('hex');
+        const expires_at = new Date(Date.now() + (voucher.duration_minutes * 60 * 1000));
+        
+        await db.query(
+            `INSERT INTO sessions (session_id, voucher_id, client_ip, mac_address, expires_at, data_used_mb, status)
+             VALUES (?, ?, ?, ?, ?, 0, 'active')`,
+            [session_id, voucher.id, client_ip, mac_address, expires_at]
+        );
         
         // Mark voucher as used
         await db.query(
@@ -101,16 +116,26 @@ exports.redeem = async (req, res) => {
             [mac_address, voucher.id]
         );
         
+        // In a real captive portal, you would add iptables rules here to allow internet access
+        // For Ubuntu setup, this would involve removing the redirect rule for this IP
+        
         res.json({ 
-            message: 'Voucher redeemed successfully',
-            voucher: {
+            success: true,
+            message: 'Internet access granted successfully!',
+            session: {
+                session_id: session_id,
                 duration_minutes: voucher.duration_minutes,
-                data_limit_mb: voucher.data_limit_mb
+                data_limit_mb: voucher.data_limit_mb,
+                expires_at: expires_at,
+                client_ip: client_ip
             }
         });
     } catch (error) {
         console.error('Redeem voucher error:', error);
-        res.status(500).json({ error: 'Failed to redeem voucher' });
+        res.status(500).json({ 
+            success: false,
+            message: 'Failed to process voucher. Please try again.' 
+        });
     }
 };
 
